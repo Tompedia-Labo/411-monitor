@@ -17,3 +17,6 @@ class Config:
 
     # Discord
     DISCORD_WEBHOOK_URL: str = os.getenv("DISCORD_WEBHOOK")
+
+    DISCORD_BOT_TOKEN: str = os.getenv("DISCORD_BOT_TOKEN")
+    DISCORD_BOT_CHANNEL_ID: str = os.getenv("DISCORD_BOT_CHANNEL_ID")

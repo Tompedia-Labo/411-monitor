@@ -22,3 +22,6 @@ class RTSPStream:
             if not ret:
                 break
             yield frame
+    
+    def release(self):
+        self.cap.release()
