@@ -45,7 +45,6 @@ async def monitor_loop():
     count = 0
     await bot.wait_until_ready()
     print("bot is ready")
-    await send_discordbot_message("Start！")
     try:
         while True:
             frame = stream.frame()
@@ -73,8 +72,12 @@ async def monitor_loop():
                     await set_discordbot_custom_status(f"在室人数: {count}人")
                     print(f"\n\n在室人数: {count}人\n\n")
 
+                await asyncio.sleep(3)
+
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
+
+
     finally:
         stream.release()
         cv2.destroyAllWindows()
