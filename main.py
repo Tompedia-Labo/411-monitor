@@ -47,42 +47,37 @@ async def monitor_loop():
     print("bot is ready")
     await send_discordbot_message("Start！")
     try:
-        for frame in stream.frames():
+        while True:
+            frame = stream.frame()
+            if frame is None:
+                continue
+
             boxes = detector.detect(frame)
             frame = draw_boxes(frame, boxes)
+
+            cv2.putText(frame, f"People: {count}", (10,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2)
+            cv2.imshow("411-monitor", frame)
+
             if count != len(boxes):
                 count = len(boxes)
-                # await asyncio.sleep(1)
                 # send_discord_message(f"411には{count}人います！")
                 if count == 1:
                     # await send_discordbot_message("最初の一人がやってきました！")
+                    print("")
                 
                 if count == 0:
                     # await set_discordbot_custom_status("誰もいません！")
                     # await send_discordbot_message("全員が退出しました。")
+                    print("")
                 else:
                     await set_discordbot_custom_status(f"在室人数: {count}人")
                     print(f"\n\n在室人数: {count}人\n\n")
-
-            
-            cv2.putText(frame, f"People: {count}", (10,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2)
-            cv2.imshow("CamCount", frame)
 
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
     finally:
         stream.release()
         cv2.destroyAllWindows()
-
-async def test():
-    await bot.wait_until_ready()
-    await send_discordbot_message("AAA")
-    await asyncio.sleep(3)
-    await send_discordbot_message("BBB")
-    await asyncio.sleep(3)
-    await send_discordbot_message("BBB")
-    await asyncio.sleep(3)
-
 
 if __name__ == "__main__":
     asyncio.run(bot.start(Config.DISCORD_BOT_TOKEN))
