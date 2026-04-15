@@ -1,5 +1,7 @@
+from api.discord_webhook import send_discord_message
+
 def main():
-    print("Hello from 411-monitor!")
+    print(send_discord_message("Hello from Python"))
 
 
 if __name__ == "__main__":
