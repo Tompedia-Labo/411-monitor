@@ -20,3 +20,6 @@ class Config:
 
     DISCORD_BOT_TOKEN: str = os.getenv("DISCORD_BOT_TOKEN")
     DISCORD_BOT_CHANNEL_ID: str = os.getenv("DISCORD_BOT_CHANNEL_ID")
+
+    # etc
+    PHOTO_SEND_RATE: int = int(os.getenv("PHOTO_SEND_RATE"))

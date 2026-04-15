@@ -1,15 +1,17 @@
+import cv2
+import asyncio
+import time
+import datetime
+import io
+
 import discord
 from discord.ext import commands
 from config import Config
 
-
-from config import Config
-from api.discord_webhook import send_discord_message
+# from api.discord_webhook import send_discord_message
 from person_detect.detector import PersonDetector
 from person_detect.rtsp_handler import RTSPStream
 from person_detect.utils import draw_boxes
-import cv2
-import asyncio
 
 
 intents = discord.Intents.default()
@@ -33,6 +35,17 @@ async def send_discordbot_message(message: str):
         print("\n\n!!! No Channnel !!!\n\n")
 
 
+async def send_discordbot_image(frame, filename):
+    print(f"\n\n### send image:  ###\n\n")
+    channel_id = Config.DISCORD_BOT_CHANNEL_ID
+    channel = await bot.fetch_channel(channel_id)
+    if channel and frame is not None:
+        _, buffer = cv2.imencode('.jpg', frame)
+        image_bytes = io.BytesIO(buffer.tobytes())
+        image_bytes.seek(0)
+        await channel.send(file=discord.File(fp=image_bytes, filename=filename))
+
+
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user}')
@@ -43,8 +56,10 @@ async def monitor_loop():
     stream = RTSPStream(Config.CAMERAS[0])
     detector = PersonDetector()
     count = 0
+    former_time = time.time()
     await bot.wait_until_ready()
     print("bot is ready")
+
     try:
         while True:
             frame = stream.frame()
@@ -56,6 +71,10 @@ async def monitor_loop():
 
             cv2.putText(frame, f"People: {count}", (10,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2)
             cv2.imshow("411-monitor", frame)
+
+            if time.time() - former_time >= Config.PHOTO_SEND_RATE and Config.PHOTO_SEND_RATE:
+                former_time = time.time()
+                await send_discordbot_image(frame, f"{datetime.datetime.now().isoformat()}.jpg")
 
             if count != len(boxes):
                 count = len(boxes)
